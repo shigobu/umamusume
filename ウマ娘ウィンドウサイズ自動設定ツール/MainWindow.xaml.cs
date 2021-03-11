@@ -22,6 +22,11 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
     public partial class MainWindow : Window
     {
         DispatcherTimer timer;
+        
+        /// <summary>
+        /// ウマ娘ウィンドウハンドル
+        /// </summary>
+        IntPtr umemusumeWindowHandle = IntPtr.Zero;
 
         public MainWindow()
         {
@@ -30,6 +35,13 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
             timer = new DispatcherTimer();
             //インターバルを100ミリ秒に
             timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            timer.Tick += Timer_Tick;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            //ウマ娘のウィンドウハンドル取得
+
         }
     }
 }
