@@ -41,6 +41,9 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 		/// </summary>
 		RECT beforeHorizontalRECT = new RECT();
 
+		RECT DefaultHorizontalRECT { get; } = new RECT(306, 157, 1613, 922);
+		RECT DefaultVerticalRECT { get; } = new RECT(748,157, 1172, 922);
+
 		const double tolerance = 1e-6;
 
         public MainWindow()
@@ -99,6 +102,16 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 					MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeVerticalRECT);
 				}
 			}
+			else
+			{
+				//デフォルトサイズに戻ってしまった場合、前のサイズに戻す
+				if (rect == DefaultVerticalRECT && beforeRECT != DefaultVerticalRECT
+					|| rect == DefaultHorizontalRECT && beforeRECT != DefaultHorizontalRECT)
+				{
+					MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeRECT);
+				}
+			}
+
 
 			beforeRECT = rect;
 		}
