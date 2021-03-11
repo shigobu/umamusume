@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace ウマ娘ウィンドウサイズ自動設定ツール
 {
@@ -20,9 +21,15 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
     /// </summary>
     public partial class MainWindow : Window
     {
+        DispatcherTimer timer;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            timer = new DispatcherTimer();
+            //インターバルを100ミリ秒に
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
         }
     }
 }
