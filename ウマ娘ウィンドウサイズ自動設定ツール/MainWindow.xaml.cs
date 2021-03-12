@@ -42,7 +42,7 @@ namespace UmamusumeAutoSize
 
             timer = new DispatcherTimer();
             //インターバルを100ミリ秒に
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 500);
             timer.Tick += Timer_Tick;
 			timer.Start();
         }
