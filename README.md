@@ -7,7 +7,6 @@ PC板ウマ娘で動作確認をしています。
 
 # 使い方
 常駐アプリとして機能します。
-画面は無しにするつもりですが、現状ダミー画面を表示しています。
 
 このアプリを起動中に、対象アプリ（ウマ娘）を起動します。対象アプリの縦初期サイズが記憶されます。
 
@@ -23,7 +22,8 @@ PC板ウマ娘で動作確認をしています。
 
 # 開発環境
 VisualStudio 2017  
-.NET Framework 4.7
+.NET Framework 4.7  
+WPF
 
 # ビルド方法
  [Hardcodet NotifyIcon for WPF](https://github.com/hardcodet/wpf-notifyicon)を使用しています。NuGetで取得するようにしていますが、参照できていない場合NuGetパッケージを再インストールしてみてください。  
