@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("ウマ娘ウィンドウサイズ自動設定ツール")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HP Inc.")]
+[assembly: AssemblyCompany("shigobu")]
 [assembly: AssemblyProduct("ウマ娘ウィンドウサイズ自動設定ツール")]
-[assembly: AssemblyCopyright("Copyright © HP Inc. 2021")]
+[assembly: AssemblyCopyright("shigobu")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
