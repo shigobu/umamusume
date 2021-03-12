@@ -26,4 +26,5 @@ VisualStudio 2017
 .NET Framework 4.7
 
 # ビルド方法
-特殊なライブラリは使用していません。VisualStudioでソリューションを開けば、ビルドできると思います。
+ [Hardcodet NotifyIcon for WPF](https://github.com/hardcodet/wpf-notifyicon)を使用しています。NuGetで取得するようにしていますが、参照できていない場合NuGetパッケージを再インストールしてみてください。  
+ 正常にNuGetパッケージがインストールされたら、ビルドができるはずです。
