@@ -16,6 +16,8 @@ using System.Diagnostics;
 using System.Xml.Serialization;
 using System.IO;
 using System.Reflection;
+using NAudio.CoreAudioApi;
+using System.Threading;
 
 namespace UmamusumeAutoSize
 {
@@ -36,6 +38,8 @@ namespace UmamusumeAutoSize
 		RECT beforeRECT = new RECT();
 
 		const double tolerance = 1e-6;
+
+		const int timeOut = 10000;
 
 		/// <summary>
 		/// 設定ファイルのファイル名
@@ -123,11 +127,9 @@ namespace UmamusumeAutoSize
 			//Windowの大きさを設定して終了。
 			if (!IsUmamusumeAppRunning)
 			{
+				WaitUmaWindowAvailable(umamusumeProcess, timeOut);
+
 				IsUmamusumeAppRunning = true;
-                if (setting.DefaultVerticalRECT == new RECT())
-                {
-                    setting.DefaultVerticalRECT = rect;
-                }
 
 				MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeVerticalRECT);
 				return;
@@ -147,25 +149,19 @@ namespace UmamusumeAutoSize
 				    if (aspectRatioCurrent < 1 && aspectRatioBefore > 1)
 				    {
                         setting.BeforeVerticalRECT = beforeRECT;
-                        //初めて横画面になったとき、横画面の初期値を保存
-                        if (setting.BeforeHorizontalRECT == new RECT())
-                        {
-                            setting.DefaultHorizontalRECT = rect;
-                        }
+
+						WaitUmaWindowAvailable(umamusumeProcess, timeOut);
+
 					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeHorizontalRECT);
 				    }
 				    //縦長になった時
 				    else if(aspectRatioBefore < 1 && aspectRatioCurrent > 1)
 				    {
                         setting.BeforeHorizontalRECT = beforeRECT;
-					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeVerticalRECT);
+
+						MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeVerticalRECT);
 				    }
 			    }
-                //デフォルトサイズになった場合、前のサイズに戻す。
-                else if (rect == setting.DefaultVerticalRECT || rect == setting.DefaultHorizontalRECT)
-                {
-                    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeRECT);
-                }
             }
 
 			beforeRECT = rect;
@@ -182,7 +178,7 @@ namespace UmamusumeAutoSize
 			{
 				return;
 			}
-			System.Threading.Thread.Sleep(200);
+			Thread.Sleep(200);
 			Win32api.MoveWindow(windowHandle, rect.X, rect.Y, rect.Width, rect.Height, false);
 		}
 
@@ -193,5 +189,69 @@ namespace UmamusumeAutoSize
         {
             this.Close();
         }
-    }
+
+		/// <summary>
+		/// ウマ娘ウィンドウの音量が０になって再び０以上になるまで待機します。
+		/// </summary>
+		/// <param name="timeOutMillisecond">タイムアウト時間ミリ秒</param>
+		private void WaitUmaWindowAvailable(Process process, int timeOutMillisecond)
+		{
+			Stopwatch stopwatch = new Stopwatch();
+			stopwatch.Start();
+
+			MMDevice device = null;
+			try
+			{
+				//ウマ娘セッションの検索
+				AudioSessionControl umamusumeSession = null;
+				while (umamusumeSession == null)
+				{
+					using (MMDeviceEnumerator DevEnum = new MMDeviceEnumerator())
+					{
+						device?.Dispose();
+						device = DevEnum.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+					}
+					AudioSessionManager sessionManager = device.AudioSessionManager;
+					var sessions = sessionManager.Sessions;
+					for (int j = 0; j < sessions.Count; j++)
+					{
+						if (sessions[j].GetProcessID == process.Id)
+						{
+							umamusumeSession = sessions[j];
+							break;
+						}
+					}
+				}
+
+				//0になるまで待機(0以外の間ループ)
+				while (umamusumeSession.AudioMeterInformation.MasterPeakValue > 0.005)
+				{
+					Thread.Sleep(10);
+					if (stopwatch.ElapsedMilliseconds > timeOutMillisecond)
+					{
+						return;
+					}
+				}
+
+				//0以上になるまで待機(0の間ループ)
+				while (umamusumeSession.AudioMeterInformation.MasterPeakValue < 0.1)
+				{
+					Thread.Sleep(10);
+					if (stopwatch.ElapsedMilliseconds > timeOutMillisecond)
+					{
+						return;
+					}
+				}
+			}
+			finally
+			{
+				if (device != null)
+				{
+					device.Dispose();
+				}
+			}
+
+		}
+
+	}
 }

@@ -16,13 +16,5 @@ namespace UmamusumeAutoSize
 		/// 前の縦RECT
 		/// </summary>
 		public RECT BeforeVerticalRECT { get; set; } = new RECT();
-		/// <summary>
-		/// 初期の横RECT
-		/// </summary>
-		public RECT DefaultHorizontalRECT { get; set; } = new RECT();
-		/// <summary>
-		/// 初期の縦RECT
-		/// </summary>
-		public RECT DefaultVerticalRECT { get; set; } = new RECT();
 	}
 }
