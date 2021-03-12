@@ -93,9 +93,32 @@ namespace UmamusumeAutoSize
 			return r.Left == Left && r.Top == Top && r.Right == Right && r.Bottom == Bottom;
 		}
 
-		public override string ToString()
+        public override bool Equals(object obj)
+        {
+            try
+            {
+                return Equals((RECT)obj);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+
+        public override string ToString()
 		{
 			return string.Format(System.Globalization.CultureInfo.CurrentCulture, "{{Left={0},Top={1},Right={2},Bottom={3}}}", Left, Top, Right, Bottom);
 		}
-	}
+
+        public override int GetHashCode()
+        {
+            var hashCode = -1819631549;
+            hashCode = hashCode * -1521134295 + Left.GetHashCode();
+            hashCode = hashCode * -1521134295 + Top.GetHashCode();
+            hashCode = hashCode * -1521134295 + Right.GetHashCode();
+            hashCode = hashCode * -1521134295 + Bottom.GetHashCode();
+            return hashCode;
+        }
+    }
 }
