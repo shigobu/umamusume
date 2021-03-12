@@ -45,8 +45,11 @@ namespace UmamusumeAutoSize
             timer.Interval = new TimeSpan(0, 0, 0, 0, 500);
             timer.Tick += Timer_Tick;
 			timer.Start();
+
+            //バルーンの表示
+            taskIcon.ShowBalloonTip("ウマいサイズ", "タスクトレイに格納されました。", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
         }
-        
+
         /// <summary>
         /// ウィンドウが閉じたときのイベント
         /// </summary>
