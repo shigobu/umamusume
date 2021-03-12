@@ -141,5 +141,13 @@ namespace UmamusumeAutoSize
 			System.Threading.Thread.Sleep(200);
 			Win32api.MoveWindow(windowHandle, rect.X, rect.Y, rect.Width, rect.Height, false);
 		}
+
+        /// <summary>
+        /// 終了メニュークリック時
+        /// </summary>
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }
