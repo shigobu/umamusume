@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:UmamusumeAutoSize"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
-        Title="ウマ娘ウィンドウサイズ自動設定アプリ" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Closed="Window_Closed">
+        Title="ウマ娘ウィンドウサイズ自動設定アプリ" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Closed="Window_Closed" Visibility="Hidden">
     <Grid>
         <tb:TaskbarIcon x:Name="taskIcon" ToolTipText="ウマいサイズ">
             <tb:TaskbarIcon.ContextMenu>
