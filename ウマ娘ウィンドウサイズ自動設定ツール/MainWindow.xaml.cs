@@ -151,7 +151,6 @@ namespace UmamusumeAutoSize
                         setting.BeforeVerticalRECT = beforeRECT;
 
 						WaitUmaWindowAvailable(umamusumeProcess, timeOut);
-
 					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeHorizontalRECT);
 				    }
 				    //縦長になった時
@@ -159,6 +158,7 @@ namespace UmamusumeAutoSize
 				    {
                         setting.BeforeHorizontalRECT = beforeRECT;
 
+						WaitUmaWindowAvailable(umamusumeProcess, timeOut);
 						MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeVerticalRECT);
 				    }
 			    }
@@ -178,7 +178,6 @@ namespace UmamusumeAutoSize
 			{
 				return;
 			}
-			Thread.Sleep(200);
 			Win32api.MoveWindow(windowHandle, rect.X, rect.Y, rect.Width, rect.Height, false);
 		}
 
