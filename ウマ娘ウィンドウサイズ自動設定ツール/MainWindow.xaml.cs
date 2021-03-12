@@ -22,7 +22,7 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
     /// </summary>
     public partial class MainWindow : Window
     {
-		string umamusumeProcessName = "umamusume";
+		const string umamusumeProcessName = "umamusume";
 
 		DispatcherTimer timer;
 
@@ -117,7 +117,7 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 		}
 
 		/// <summary>
-		/// 指定のウィンドウの移動とサイズ変更を行います。
+		/// 指定ウィンドウの移動とサイズ変更を行います。
 		/// </summary>
 		/// <param name="windowHandle">ウィンドウハンドル</param>
 		/// <param name="rect">RECTオブジェクト</param>
