@@ -11,10 +11,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Diagnostics;
-using DefaultSetting = UmamusumeAutoSize.Properties.Settings;
+using System.Xml.Serialization;
+using System.IO;
+using System.Reflection;
 
 namespace UmamusumeAutoSize
 {
@@ -36,11 +37,45 @@ namespace UmamusumeAutoSize
 
 		const double tolerance = 1e-6;
 
+		/// <summary>
+		/// 設定ファイルのファイル名
+		/// </summary>
+		private string SettingFileName
+		{
+			get
+			{
+				Assembly assembly = Assembly.GetEntryAssembly();
+				string assemblyPath = assembly.Location;
+				string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
+
+				return Path.Combine(assemblyDirectory, "setting.xml");
+			}
+		}
+
+		/// <summary>
+		/// 設定データ
+		/// </summary>
+		private Setting setting = null;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            timer = new DispatcherTimer();
+			//Xmlから設定読み込み
+			if (File.Exists(SettingFileName))
+			{
+				XmlSerializer serializer = new XmlSerializer(typeof(Setting));
+				using (StreamReader streamReader = new StreamReader(SettingFileName, new UTF8Encoding(false)))
+				{
+					setting = (Setting)serializer.Deserialize(streamReader);
+				}
+			}
+			else
+			{
+				setting = new Setting();
+			}
+
+			timer = new DispatcherTimer();
             //インターバルを100ミリ秒に
             timer.Interval = new TimeSpan(0, 0, 0, 0, 500);
             timer.Tick += Timer_Tick;
@@ -48,15 +83,22 @@ namespace UmamusumeAutoSize
 
             //バルーンの表示
             taskIcon.ShowBalloonTip("ウマいサイズ", "タスクトレイに格納されました。", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
-        }
+
+		}
 
         /// <summary>
         /// ウィンドウが閉じたときのイベント
         /// </summary>
         private void Window_Closed(object sender, EventArgs e)
         {
-            DefaultSetting.Default.Save();
-        }
+			//XmlSerializerオブジェクトを作成
+			XmlSerializer serializer = new XmlSerializer(typeof(Setting));
+			using (StreamWriter streamWriter = new StreamWriter(SettingFileName, false, new UTF8Encoding(false)))
+			{
+				//シリアル化し、XMLファイルに保存する
+				serializer.Serialize(streamWriter, setting);
+			}
+		}
 
         /// <summary>
         /// タイマーティックイベント
@@ -82,12 +124,12 @@ namespace UmamusumeAutoSize
 			if (!IsUmamusumeAppRunning)
 			{
 				IsUmamusumeAppRunning = true;
-                if (DefaultSetting.Default.DefaultVerticalRECT == new RECT())
+                if (setting.DefaultVerticalRECT == new RECT())
                 {
-                    DefaultSetting.Default.DefaultVerticalRECT = rect;
+                    setting.DefaultVerticalRECT = rect;
                 }
 
-				MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, DefaultSetting.Default.BeforeVerticalRECT);
+				MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeVerticalRECT);
 				return;
 			}
 
@@ -104,24 +146,23 @@ namespace UmamusumeAutoSize
 				    //横画面になった時
 				    if (aspectRatioCurrent < 1 && aspectRatioBefore > 1)
 				    {
-                        DefaultSetting.Default.BeforeVerticalRECT = beforeRECT;
+                        setting.BeforeVerticalRECT = beforeRECT;
                         //初めて横画面になったとき、横画面の初期値を保存
-                        if (DefaultSetting.Default.BeforeHorizontalRECT == new RECT())
+                        if (setting.BeforeHorizontalRECT == new RECT())
                         {
-                            DefaultSetting.Default.DefaultHorizontalRECT = rect;
+                            setting.DefaultHorizontalRECT = rect;
                         }
-					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, DefaultSetting.Default.BeforeHorizontalRECT);
+					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeHorizontalRECT);
 				    }
 				    //縦長になった時
 				    else if(aspectRatioBefore < 1 && aspectRatioCurrent > 1)
 				    {
-                        DefaultSetting.Default.BeforeHorizontalRECT = beforeRECT;
-					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, DefaultSetting.Default.BeforeVerticalRECT);
+                        setting.BeforeHorizontalRECT = beforeRECT;
+					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, setting.BeforeVerticalRECT);
 				    }
 			    }
-
                 //デフォルトサイズになった場合、前のサイズに戻す。
-                if (rect == DefaultSetting.Default.DefaultVerticalRECT || rect == DefaultSetting.Default.DefaultHorizontalRECT)
+                else if (rect == setting.DefaultVerticalRECT || rect == setting.DefaultHorizontalRECT)
                 {
                     MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeRECT);
                 }
