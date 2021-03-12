@@ -14,8 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Diagnostics;
+using DefaultSetting = UmamusumeAutoSize.Properties.Settings;
 
-namespace ウマ娘ウィンドウサイズ自動設定ツール
+namespace UmamusumeAutoSize
 {
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
@@ -32,17 +33,6 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 		/// 前のウィンドウサイズ
 		/// </summary>
 		RECT beforeRECT = new RECT();
-		/// <summary>
-		/// 前の縦長ウィンドウサイズ
-		/// </summary>
-		RECT beforeVerticalRECT = new RECT();
-		/// <summary>
-		/// 前の横長ウィンドウサイズ
-		/// </summary>
-		RECT beforeHorizontalRECT = new RECT();
-
-		RECT DefaultHorizontalRECT { get; } = new RECT(306, 157, 1613, 922);
-		RECT DefaultVerticalRECT { get; } = new RECT(748,157, 1172, 922);
 
 		const double tolerance = 1e-6;
 
@@ -56,7 +46,18 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
             timer.Tick += Timer_Tick;
 			timer.Start();
         }
+        
+        /// <summary>
+        /// ウィンドウが閉じたときのイベント
+        /// </summary>
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            DefaultSetting.Default.Save();
+        }
 
+        /// <summary>
+        /// タイマーティックイベント
+        /// </summary>
         private void Timer_Tick(object sender, EventArgs e)
         {
 			//ウマ娘のウィンドウハンドル取得
@@ -71,16 +72,21 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 
 			Process umamusumeProcess = process.First();
 
+			bool error = Win32api.GetWindowRect(umamusumeProcess.MainWindowHandle, out RECT rect);
+
 			//起動を検知したら、フラグセット。
 			//Windowの大きさを設定して終了。
 			if (!IsUmamusumeAppRunning)
 			{
 				IsUmamusumeAppRunning = true;
-				MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeVerticalRECT);
+                if (DefaultSetting.Default.DefaultVerticalRECT == new RECT())
+                {
+                    DefaultSetting.Default.DefaultVerticalRECT = rect;
+                }
+
+				MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, DefaultSetting.Default.BeforeVerticalRECT);
 				return;
 			}
-
-			bool error = Win32api.GetWindowRect(umamusumeProcess.MainWindowHandle, out RECT rect);
 
             //サイズ変更が行われた
             if (rect != beforeRECT)
@@ -95,23 +101,27 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 				    //横画面になった時
 				    if (aspectRatioCurrent < 1 && aspectRatioBefore > 1)
 				    {
-					    beforeVerticalRECT = beforeRECT;
-					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeHorizontalRECT);
+                        DefaultSetting.Default.BeforeVerticalRECT = beforeRECT;
+                        //初めて横画面になったとき、横画面の初期値を保存
+                        if (DefaultSetting.Default.BeforeHorizontalRECT == new RECT())
+                        {
+                            DefaultSetting.Default.DefaultHorizontalRECT = rect;
+                        }
+					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, DefaultSetting.Default.BeforeHorizontalRECT);
 				    }
 				    //縦長になった時
 				    else if(aspectRatioBefore < 1 && aspectRatioCurrent > 1)
 				    {
-					    beforeHorizontalRECT = beforeRECT;
-					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeVerticalRECT);
+                        DefaultSetting.Default.BeforeHorizontalRECT = beforeRECT;
+					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, DefaultSetting.Default.BeforeVerticalRECT);
 				    }
 			    }
 
                 //デフォルトサイズになった場合、前のサイズに戻す。
-                if (rect == DefaultVerticalRECT || rect == DefaultHorizontalRECT)
+                if (rect == DefaultSetting.Default.DefaultVerticalRECT || rect == DefaultSetting.Default.DefaultHorizontalRECT)
                 {
                     MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeRECT);
                 }
-
             }
 
 			beforeRECT = rect;
@@ -131,6 +141,5 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 			System.Threading.Thread.Sleep(200);
 			Win32api.MoveWindow(windowHandle, rect.X, rect.Y, rect.Width, rect.Height, false);
 		}
-
-	}
+    }
 }

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ウマ娘ウィンドウサイズ自動設定ツール
+namespace UmamusumeAutoSize
 {
  	internal class Win32api
 	{
@@ -40,6 +40,7 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 		internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 	}
 
+    [Serializable]
 	[StructLayout(LayoutKind.Sequential)]
 	public struct RECT
 	{

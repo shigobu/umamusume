@@ -1,10 +1,10 @@
-﻿<Window x:Class="ウマ娘ウィンドウサイズ自動設定ツール.MainWindow"
+﻿<Window x:Class="UmamusumeAutoSize.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ウマ娘ウィンドウサイズ自動設定ツール"
+        xmlns:local="clr-namespace:UmamusumeAutoSize"
         mc:Ignorable="d"
-        Title="ウマ娘大きく見たい" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+        Title="ウマ娘大きく見たい" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Closed="Window_Closed">
     <TextBlock>ダミー</TextBlock>
 </Window>
