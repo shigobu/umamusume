@@ -82,36 +82,37 @@ namespace ウマ娘ウィンドウサイズ自動設定ツール
 
 			bool error = Win32api.GetWindowRect(umamusumeProcess.MainWindowHandle, out RECT rect);
 
-			//ウィンドウの縦横比が変わったら、大きさ変更
-			double aspectRatioCurrent = (double)rect.Height / rect.Width;
-			double aspectRatioBefore = (double)beforeRECT.Height / beforeRECT.Width;
+            //サイズ変更が行われた
+            if (rect != beforeRECT)
+            {
+			    //ウィンドウの縦横比が変わったら、大きさ変更
+			    double aspectRatioCurrent = (double)rect.Height / rect.Width;
+			    double aspectRatioBefore = (double)beforeRECT.Height / beforeRECT.Width;
 
-			//浮動小数点の比較は、誤差があるので差の絶対値を求めて、誤差以上の場合等しくない。
-			if (Math.Abs(aspectRatioCurrent - aspectRatioBefore) > tolerance)
-			{
-				//横画面になった時
-				if (aspectRatioCurrent < 1 && aspectRatioBefore > 1)
-				{
-					beforeVerticalRECT = beforeRECT;
-					MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeHorizontalRECT);
-				}
-				//縦長になった時
-				else if(aspectRatioBefore < 1 && aspectRatioCurrent > 1)
-				{
-					beforeHorizontalRECT = beforeRECT;
-					MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeVerticalRECT);
-				}
-			}
-			else
-			{
-				//デフォルトサイズに戻ってしまった場合、前のサイズに戻す
-				if (rect == DefaultVerticalRECT && beforeRECT != DefaultVerticalRECT
-					|| rect == DefaultHorizontalRECT && beforeRECT != DefaultHorizontalRECT)
-				{
-					MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeRECT);
-				}
-			}
+			    //浮動小数点の比較は、誤差があるので差の絶対値を求めて、誤差以上の場合等しくない。
+			    if (Math.Abs(aspectRatioCurrent - aspectRatioBefore) > tolerance)
+			    {
+				    //横画面になった時
+				    if (aspectRatioCurrent < 1 && aspectRatioBefore > 1)
+				    {
+					    beforeVerticalRECT = beforeRECT;
+					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeHorizontalRECT);
+				    }
+				    //縦長になった時
+				    else if(aspectRatioBefore < 1 && aspectRatioCurrent > 1)
+				    {
+					    beforeHorizontalRECT = beforeRECT;
+					    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeVerticalRECT);
+				    }
+			    }
 
+                //デフォルトサイズになった場合、前のサイズに戻す。
+                if (rect == DefaultVerticalRECT || rect == DefaultHorizontalRECT)
+                {
+                    MoveUmamusumeWindow(umamusumeProcess.MainWindowHandle, beforeRECT);
+                }
+
+            }
 
 			beforeRECT = rect;
 		}
