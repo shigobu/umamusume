@@ -71,7 +71,7 @@ namespace UmamusumeAutoSize
 			}
 
 			timer = new DispatcherTimer();
-            //インターバルを100ミリ秒に
+            //インターバルを設定
             timer.Interval = new TimeSpan(0, 0, 0, 0, 500);
             timer.Tick += Timer_Tick;
 			timer.Start();
@@ -103,9 +103,23 @@ namespace UmamusumeAutoSize
 			//ウマ娘のウィンドウハンドル取得
 			Process[] process = Process.GetProcessesByName(umamusumeProcessName);
 
-			//アプリ起動中で無い時は、フラグクリアして終了
+			//アプリの終了を検知した場合
 			if (process.Length == 0)
 			{
+				if (IsUmamusumeAppRunning)
+				{
+					double aspectRatioBefore = (double)beforeRECT.Height / beforeRECT.Width;
+					if (aspectRatioBefore > 1)
+					{
+						//縦
+						setting.BeforeVerticalRECT = beforeRECT;
+					}
+					else
+					{
+						//横
+						setting.BeforeHorizontalRECT = beforeRECT;
+					}
+				}
 				IsUmamusumeAppRunning = false;
 				return;
 			}

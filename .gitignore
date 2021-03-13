@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 /ウマ娘ウィンドウサイズ自動設定ツール/Resources/Icon1.ico
+/リリース
+*.zip
